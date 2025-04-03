@@ -40,11 +40,13 @@ declare module "@mui/material" {
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
+    bodyBold: React.CSSProperties;
     headline: React.CSSProperties;
     headlineSmall: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
+    bodyBold?: React.CSSProperties;
     headline?: React.CSSProperties;
     headlineSmall?: React.CSSProperties;
   }
@@ -66,9 +68,22 @@ declare module "@mui/material/styles" {
   }
 }
 
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    bodyBold: true;
+    headline: true;
+    headlineSmall: true;
+  }
+}
+
 const theme = createTheme({
   typography: {
     fontFamily: "var(--font-roboto)",
+    bodyBold: {
+      fontSize: "1rem",
+      fontWeight: 600,
+      lineHeight: 1.5,
+    },
     headline: {
       fontSize: "3rem",
       fontWeight: 300,

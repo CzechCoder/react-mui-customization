@@ -6,6 +6,8 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
+  Grid,
+  Input,
   Radio,
   RadioGroup,
   Slider,
@@ -23,7 +25,8 @@ import { CustomCheckRadio, CustomRadio } from "./custom-radio";
 import { CustomCheckbox, CustomCheckCheckbox } from "./custom-checkbox";
 import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeUp from "@mui/icons-material/VolumeUp";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { CustomSlider, CustomThumbComponent } from "./custom-sliders";
 
 const sliderMarks = [
   {
@@ -45,22 +48,82 @@ const sliderMarks = [
 ];
 
 export const OtherInputs = () => {
-  const [sliderValue, setSliderValue] = useState<number[]>([20, 37]);
+  const [doubleSliderValue, setDoubleSliderValue] = useState<number[]>([
+    20, 37,
+  ]);
 
-  const handleChange = (event: Event, newValue: number[]) => {
-    setSliderValue(newValue);
+  const [inputSliderValue, setInputSliderValue] = useState<number>(30);
+
+  const [customSliderValue, setCustomSliderValue] = useState<number[]>([
+    30, 60,
+  ]);
+
+  const handleDoubleSliderChange = (
+    event: Event,
+    newValue: number[],
+    activeThumb: number
+  ) => {
+    const minDistance = 10;
+
+    if (newValue[1] - newValue[0] < minDistance) {
+      if (activeThumb === 0) {
+        const clamped = Math.min(newValue[0], 100 - minDistance);
+        setDoubleSliderValue([clamped, clamped + minDistance]);
+      } else {
+        const clamped = Math.max(newValue[1], minDistance);
+        setDoubleSliderValue([clamped - minDistance, clamped]);
+      }
+    } else {
+      setDoubleSliderValue(newValue);
+    }
   };
+
+  const handleInputSliderSliderChange = (event: Event, newValue: number) => {
+    setInputSliderValue(newValue);
+  };
+
+  const handleInputSliderChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setInputSliderValue(
+      event.target.value === "" ? 0 : Number(event.target.value)
+    );
+  };
+
+  const handleInputSliderBlur = () => {
+    if (inputSliderValue < 0) {
+      setInputSliderValue(0);
+    } else if (inputSliderValue > 100) {
+      setInputSliderValue(100);
+    }
+  };
+
+  const getCustomSliderColor = (): string => {
+    const valueDifference = customSliderValue[1] - customSliderValue[0];
+    if (valueDifference <= 40) return "red";
+    if (valueDifference <= 50) return "orange";
+    if (valueDifference <= 60) return "green";
+    if (valueDifference <= 70) return "blue";
+    if (valueDifference <= 80) return "purple";
+    return "black";
+  };
+
+  const customSliderColor: string = useMemo(
+    () => getCustomSliderColor(),
+    [customSliderValue]
+  );
+
   return (
     <>
       <Typography variant="h3">Checkbox</Typography>
-      <Typography variant="body1">Basic variants</Typography>
+      <Typography variant="bodyBold">Basic variants</Typography>
       <Stack spacing={2} direction={{ xs: "column", md: "row" }}>
         <Checkbox defaultChecked />
         <Checkbox />
         <Checkbox disabled />
         <Checkbox disabled checked />
       </Stack>
-      <Typography variant="body1">Custom variants</Typography>
+      <Typography variant="bodyBold">Custom variants</Typography>
       <Stack spacing={2} direction={{ xs: "column", md: "row" }}>
         <FormGroup row>
           <FormControlLabel
@@ -136,7 +199,7 @@ export const OtherInputs = () => {
       </Stack>
       <Divider sx={{ my: 5 }} variant="fullWidth" />
       <Typography variant="h3">Radio</Typography>
-      <Typography variant="body1">Basic variants</Typography>
+      <Typography variant="bodyBold">Basic variants</Typography>
       <Stack spacing={2} direction={{ xs: "column", md: "row" }}>
         <FormControl>
           <FormLabel id="radio-buttons-group-label">
@@ -160,7 +223,7 @@ export const OtherInputs = () => {
           </RadioGroup>
         </FormControl>
       </Stack>
-      <Typography variant="body1">Custom variants</Typography>
+      <Typography variant="bodyBold">Custom variants</Typography>
       <Stack spacing={2} direction={{ xs: "column", md: "row" }}>
         <FormControl>
           <FormLabel id="radio-buttons-group-label-disney">
@@ -219,7 +282,7 @@ export const OtherInputs = () => {
       </Stack>
       <Divider sx={{ my: 5 }} variant="fullWidth" />
       <Typography variant="h3">Slider</Typography>
-      <Typography variant="body1">Basic variants</Typography>
+      <Typography variant="bodyBold">Basic variants</Typography>
       <Stack spacing={2} direction="column">
         <Box sx={{ width: 300 }}>
           <Stack
@@ -238,13 +301,66 @@ export const OtherInputs = () => {
             step={10}
             valueLabelDisplay="auto"
             marks={sliderMarks}
+            color="info"
           />
           <Slider
-            value={sliderValue}
-            onChange={handleChange}
+            value={doubleSliderValue}
+            onChange={handleDoubleSliderChange}
             min={0}
             max={100}
+            color="success"
             valueLabelDisplay="auto"
+            disableSwap
+          />
+        </Box>
+        <Box sx={{ width: 250 }}>
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid>
+              <VolumeUp />
+            </Grid>
+            <Grid size="grow">
+              <Slider
+                color="error"
+                value={
+                  typeof inputSliderValue === "number" ? inputSliderValue : 0
+                }
+                onChange={handleInputSliderSliderChange}
+                aria-labelledby="input-slider"
+              />
+            </Grid>
+            <Grid>
+              <Input
+                value={inputSliderValue}
+                size="small"
+                onChange={handleInputSliderChange}
+                onBlur={handleInputSliderBlur}
+                inputProps={{
+                  step: 10,
+                  min: 0,
+                  max: 100,
+                  type: "number",
+                  "aria-labelledby": "input-slider",
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+      </Stack>
+      <Typography variant="bodyBold">Custom variants</Typography>
+      <Stack spacing={2} direction="column">
+        <Box sx={{ width: 300 }}>
+          <CustomSlider
+            slots={{ thumb: CustomThumbComponent }}
+            slotProps={{ thumb: { color: customSliderColor } }}
+            value={customSliderValue}
+            onChange={(_, newValue) =>
+              setCustomSliderValue(newValue as number[])
+            }
+            getAriaLabel={(index) =>
+              index === 0 ? "Minimum price" : "Maximum price"
+            }
+            defaultValue={[20, 40]}
+            customColor={customSliderColor}
           />
         </Box>
       </Stack>
