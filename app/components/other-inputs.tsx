@@ -26,7 +26,12 @@ import { CustomCheckbox, CustomCheckCheckbox } from "./custom-checkbox";
 import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 import { useMemo, useState } from "react";
-import { CustomSlider, CustomThumbComponent } from "./custom-sliders";
+import {
+  CustomSlider,
+  CustomSliderBullet,
+  CustomSliderSingle,
+  CustomThumbComponent,
+} from "./custom-sliders";
 
 const sliderMarks = [
   {
@@ -348,7 +353,7 @@ export const OtherInputs = () => {
       </Stack>
       <Typography variant="bodyBold">Custom variants</Typography>
       <Stack spacing={2} direction="column">
-        <Box sx={{ width: 300 }}>
+        <Box sx={{ width: 300 }} gap={6} display="flex" flexDirection="column">
           <CustomSlider
             slots={{ thumb: CustomThumbComponent }}
             slotProps={{ thumb: { color: customSliderColor } }}
@@ -356,12 +361,12 @@ export const OtherInputs = () => {
             onChange={(_, newValue) =>
               setCustomSliderValue(newValue as number[])
             }
-            getAriaLabel={(index) =>
-              index === 0 ? "Minimum price" : "Maximum price"
-            }
             defaultValue={[20, 40]}
             customColor={customSliderColor}
+            disableSwap
           />
+          <CustomSliderSingle />
+          <CustomSliderBullet valueLabelDisplay="on" />
         </Box>
       </Stack>
     </>
